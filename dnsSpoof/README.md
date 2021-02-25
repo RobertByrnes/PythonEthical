@@ -1,5 +1,5 @@
 # Setup / Close
-create an accessible que usinf iptables:
+create an accessible que using iptables:
 iptables -I FORWARD -j NFQUEUE --queue-num 0
 restore iptables after use:
 iptables --Flush
@@ -18,4 +18,16 @@ to one of choice made by the hacker machine.
 # Check
 DNSQR - dns question record - qname contains domain name
 DNSRR - dns resource record - A record - rdata field - contains IP
+
+# Possible HTTP Targets
+http://testphp.vulnweb.com
+http://speedbit.com
+http://www.stealmylogin.com
+
+# os.system("iptables --flush")
+# os.system("iptables --table nat --flush")
+# os.system("iptables --delete -chain")
+# os.system("iptables --table nat --delete -chain")
+# os.system("iptables -P FORWARD ACCEPT")
+# os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
 

