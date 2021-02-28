@@ -1,4 +1,5 @@
 #! usr/bin/env python
+# use python 2.7
 import smtplib
 import pynput.keyboard
 import threading

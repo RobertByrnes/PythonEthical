@@ -1,4 +1,5 @@
 #! user/bin/env python
+# use python 2.7 as interpreter
 
 import netfilterqueue
 import scapy.all as scapy

@@ -10,10 +10,10 @@ def capture_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--target", dest="target", help="IP to scan or range of IP addresses e.g. 192.168.0.1/24")
     # options = variables, arguments = --i or --m
-    options = parser.parse_args()
-    if not options.target:
+    args = parser.parse_args()
+    if not args.target:
         parser.error("[-] Please specify an IP address or range of IP addresses, use --help for info")
-    return options
+    return args
 
 
 def scan(ip):

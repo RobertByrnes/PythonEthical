@@ -1,6 +1,5 @@
 #! usr/bin/python
 import argparse
-import os
 import time
 
 import scapy.all as scapy
@@ -19,7 +18,6 @@ def capture_ips():
 
 class ArpSpoof:
     def __init__(self, targets):
-        # os.system("echo 1 > /proc/sys/net/ipv4/ip_forward")
         self.time_interval = 0.5
         self.targets = targets
         if self.targets:
@@ -65,8 +63,6 @@ class ArpSpoof:
             self.restore(gateway_ip, target_ip)
 
 
-victims = capture_ips()
-if victims:
-    spoofer = ArpSpoof(victims)
-
-
+target = capture_ips()
+if target:
+    spoofer = ArpSpoof(target)

