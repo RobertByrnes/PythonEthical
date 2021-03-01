@@ -67,7 +67,7 @@ Got Query on Sun May 25 12:51:23 2014
  Received Query ID:33693
  Query Data Count:1
  Current DNS Server:8.8.8.8
- DNS Query:yaooo.com.
+ DNS Query:yahoo.com.
 
  Sending spoofed response packet
 Sent 1 packets.

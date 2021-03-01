@@ -55,7 +55,7 @@ class ArpSpoof:
                 self.arp_spoof(target_ip, gateway_ip)
                 self.arp_spoof(gateway_ip, target_ip)
                 sent_packets_count = sent_packets_count + 2
-                print("\r[+] Packets sent: " + str(sent_packets_count))
+                print("[+] Packets sent: " + str(sent_packets_count))
                 time.sleep(self.time_interval)
         except KeyboardInterrupt:
             print("\n[+] Detected CTRL+C, resetting ARP tables now.\n")
