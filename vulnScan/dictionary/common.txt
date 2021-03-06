@@ -1,3 +1,7 @@
+assets
+includes
+classes
+login
 0
 00
 01

@@ -1,6 +1,6 @@
+www
 mail
 mail2
-www
 ns2
 ns1
 blog
