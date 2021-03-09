@@ -19,9 +19,9 @@ class SaveData:
         if not os.path.isfile(self.crawled_dirs_path):
             self.write_file(self.crawled_dirs_path, base_url)
         if not os.path.isfile(self.links_path):
-            self.write_file(self.links_path, '')
+            self.write_file(self.links_path, base_url)
         if not os.path.isfile(self.queued_links_path):
-            self.write_file(self.queued_links_path, '')
+            self.write_file(self.queued_links_path, base_url)
 
     def write_file(self, path, data):
         with open(path, 'w') as f:

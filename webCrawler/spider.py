@@ -2,12 +2,30 @@
 import requests
 import re
 import urllib.parse as urlparse
+from savedata import SaveData
 
 
 class Spider:
-    def __init__(self, url):
-        self.target_links = []
-        self.target_url = url
+    def __init__(self, url, name):
+        self.TARGET_URL = url
+        self.PROJECT_NAME = name
+        self.queued_links_file = self.PROJECT_NAME + "/queued_links.txt"
+        self.links_visited_file = self.PROJECT_NAME + "/visited_links.txt"
+        self.queue = set()
+        self.crawled = set()
+        self.search()
+        self.Saver = SaveData()
+
+    def search(self, url=None):
+        if url is None:
+            url = self.TARGET_URL
+        href_links = self.extract_links(url)
+        for link in href_links:
+            link = urlparse.urljoin(url, link)
+            if "#" in link:
+                link = link.split("#")[0]
+            self.sort_to_queue(link)
+            self.add_to_crawled_set(link)
 
     def extract_links(self, url):
         try:
@@ -18,14 +36,18 @@ class Spider:
         except requests.exceptions.MissingSchema:
             pass
 
-    def search(self, url=None):
-        if url is None:
-            url = self.target_url
-        href_links = self.extract_links(url)
-        for link in href_links:
-            link = urlparse.urljoin(url, link)
-            if "#" in link:
-                link = link.split("#")[0]
-            if self.target_url in link and link not in self.target_links:
-                self.target_links.append(link)
-        return self.target_links
+    def sort_to_queue(self, link):
+        if (link not in self.crawled) or (link not in self.queue):
+            self.queue.add(link)
+
+    def add_to_crawled_set(self, link):
+        if link not in self.crawled:
+            self.crawled.add(link)
+
+    def update(self):
+        self.Saver.set_to_file(self.queue, self.queued_links_file)
+        self.Saver.set_to_file(self.crawled, self.links_visited_file)
+
+
+
+

@@ -3,74 +3,54 @@
 import threading
 from spider import Spider
 from savedata import SaveData
-import time
-target_url = "https://www.skatewarehouse.co.uk"
-project_name = "skatewarehouse"
-workers = 1
-save = SaveData()
-spider = Spider(target_url)
-visited = []
-queued = []
+from queue import Queue
 
 
-new_links = []
+class SpiderMain:
+    def __init__(self):
+        self.TARGET_URL = "https://www.skatewarehouse.co.uk"
+        self.PROJECT_NAME = "skatewarehouse"
+        self.WORKERS = 4
+        self.Spider = Spider(self.TARGET_URL, self.PROJECT_NAME)  # crawling object
+        self.Saver = SaveData()  # saving object
+        self.QUEUE = Queue()  # queue object
 
+    def init_files(self, name, url):  # using saver object to create dir and files
+        self.Saver.create_dir(name)
+        self.Saver.create_files(name, url)
 
-def on_boot(name, url):
-    save.create_dir(name)
-    save.create_files(name, url)
+    def spawn_spiders(self):  # creates workers using threading lib
+        print("[+] Creating workforce of " + str(self.WORKERS) + " spiders >>")
+        for _ in range(self.WORKERS):
+            thread = threading.Thread(target=self.accept_job)
+            thread.daemon = False
+            thread.start()
 
+    def accept_job(self):
+        link = self.QUEUE.get()  # take a job from the queue
+        self.Spider.search(link)  # crawl this link
+        self.QUEUE.task_done()  # indicate job is complete
 
-def producer():
-    page_links = spider.search()
-    for link in page_links:
-        save.append_to_file(save.queued_links_path, link)
-        save.append_to_file(save.links_path, link)
-    print("[+] links transferred to queue by " + threading.current_thread().name + " >>\n")
-    return True
+    def crawl(self):
+        links_queue = self.Saver.file_to_set(self.Saver.queued_links_path)
+        if len(links_queue) > 0:
+            print("[+] " + str(len(links_queue)) + " queued links awaiting spiders >>")
+        self.add_job()
 
+    def add_job(self):
+        for link in self.Saver.file_to_set(self.Saver.queued_links_path):
+            self.QUEUE.put(link)
+        self.QUEUE.join()
+        self.crawl()
 
-def make_queues():
-    with open(save.queued_links_path, "r") as links:
-        for link in links:
-            queued.append(link)
-    links.close()
-    print("[+] Queue length >> " + str(len(queued)))
-    time.sleep(.5)
-    save.delete_file_contents(save.queued_links_path)
-    with open(save.links_path, "r") as test_links:
-        for test_link in test_links:
-            visited.append(test_link)
-    test_links.close()
-    print("[+] Visited links count >> " + str(len(visited)))
-    time.sleep(.5)
-    save.delete_file_contents(save.queued_links_path)
-    return True
+    def main(self):
+        self.init_files(self.PROJECT_NAME, self.TARGET_URL)
 
+        self.spawn_spiders()
 
-def spiders():
-    try:
-        page_links = spider.search(queued.pop())  # remove and use search link from the end of the queue
-        for link in page_links:
-            if visited.count(link) == 0:  # check if any new link already in links.txt
-                print(link + " found by " + threading.current_thread().name)
-                save.append_to_file(save.links_path, link)  # if it is not already in links.txt put it there
-        if make_queues():
-            spiders()
-    except:
-        pass
-
-
-
-def main():
-    on_boot(project_name, target_url)
-    if producer():
-        if make_queues():
-            print("[+] Creating workforce of " + str(workers) + " threads >>\n")
-            for _ in range(workers):
-                t = threading.Thread(target=spiders)
-                t.start()
+        self.crawl()
 
 
 if __name__ == "__main__":
-    main()
+    run = SpiderMain()
+    run.main()
