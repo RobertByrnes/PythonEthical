@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import threading
-import crawler
+from working import crawler
 from savedata import SaveData
 
 target_url = "www.skatewarehouse.co.uk"
@@ -19,7 +19,7 @@ def on_boot(name, url):
 
 
 def producer():
-    with open("dictionaries/common.txt", "r+") as wordlist:
+    with open("../dictionaries/common.txt", "r+") as wordlist:
         for line in wordlist:
             line = line.strip()
             queued_words.append(line)
