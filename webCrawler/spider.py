@@ -10,8 +10,8 @@ class Spider:
         self.TARGET_URL = url
         self.domain = self.get_domain_name(url)
         self.PROJECT_NAME = name
-        self.queued_links_file = name + "\\queued_links.txt"
-        self.links_visited_file = name + "\\visited_links.txt"
+        self.queued_links_file = name + "\\results\\queued_links.txt"
+        self.links_visited_file = name + "\\results\\visited_links.txt"
         self.Saver = SaveData()
         self.queue = set()
         self.crawled = set()
