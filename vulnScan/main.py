@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import argparse
+import threading
 import scanner
 import proxies
 
@@ -8,6 +9,8 @@ import proxies
 def capture_args():
     parser = argparse.ArgumentParser(prog="Vulnerability Scanner",
                                      description="Scan a url for potential vulnerabilities.")
+    parser.add_argument("-n", "--name", dest="scan_name", help="This is the name of the directory created to hold"
+                        " scans for this project.")
     parser.add_argument("-t", "--target", dest="target_url", help="Target url e.g http://example.co.uk.")
     parser.add_argument("-d", "--depth", dest="proxy_count", help="Essentially how deep to go digging for proxies.")
     parser.add_argument("-c", "--cutoff", dest="time_to_cutoff", help="How long to wait for server response in proxy "
@@ -27,6 +30,9 @@ def capture_args():
     parser.add_argument("-F", "--forms", action='store_true', default=False, help="Must be passed to extract forms "
                         "data from"
                         " specified url.")
+    parser.add_argument("-Th", "--threads", default=8, dest="threads", help="This program uses threading. The default "
+                        "is 8 threads.")
+    parser.add_argument("-a", "--all", action="store_true", default=False, help="Performs all scans.")
     build_scan = parser.parse_args()
     if not build_scan.target_url:
         parser.error("\n[-] Please specify a target and a gateway, use --help for info\n")
@@ -39,24 +45,24 @@ def setup_proxy():
     return proxy_servers
 
 
-def setup_scanner(user_args):
-    target_url = user_args.target_url
-    vuln_scanner = scanner.Scanner(target_url)
-    return vuln_scanner
+def run_program(user_args):
+    for _ in range(int(user_args.threads)):
+        thread = threading.Thread()
+        thread.daemon = True
+        thread.start()
 
+    vuln_scanner = scanner.Scanner(user_args.target_url, user_args.scan_name, threading.current_thread().name)
 
-def run_program(vuln_scanner, user_args):
-    if user_args.subdomain:
+    if user_args.subdomain or user_args.all:
         print(str(vuln_scanner.find_subdomains()))
-    if user_args.subdirectories:
+    if user_args.subdirectories or user_args.all:
         print(str(vuln_scanner.find_directories()))
-    if user_args.crawler:
-        print(str(vuln_scanner.crawl()))
-    if user_args.forms:
+    if user_args.crawler or user_args.all:
+        print(str(vuln_scanner.crawl_single_url()))
+    if user_args.forms or user_args.all:
         print(str(vuln_scanner.extract_forms()))
 
 
 args = capture_args()
 # proxy = setup_proxy()
-scan = setup_scanner(args)
-run_program(scan, args)
+run_program(args)
