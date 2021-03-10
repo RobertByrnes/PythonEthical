@@ -2,15 +2,15 @@
 
 import threading
 from spider import Spider
-from savedata import *
+from save_data import *
 from queue import Queue
 
 
 class SpiderMain:
     def __init__(self):
-        self.TARGET_URL = "https://www.creditoncoffee.co.uk"
-        self.PROJECT_NAME = "ccc"
-        self.queue_path = self.PROJECT_NAME + "/results/queued_links.txt"
+        self.TARGET_URL = "https://www.skatewarehouse.co.uk"
+        self.PROJECT_NAME = "skatewarehouse"
+        self.queue_path = "results/" + self.PROJECT_NAME + "/queued_links.txt"
         self.WORKERS = 4
         self.Spider = Spider(self.TARGET_URL, self.PROJECT_NAME)  # crawling object
         self.QUEUE = Queue()  # queue object
