@@ -43,9 +43,8 @@ class SpiderMain:
         self.crawl()
 
     def main(self):
-        self.spawn_spiders()
-
         self.crawl()
+        self.spawn_spiders()
 
 
 if __name__ == "__main__":

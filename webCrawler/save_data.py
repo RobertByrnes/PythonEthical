@@ -10,19 +10,19 @@ class SaveData:
     def create_dir(directory):
         if not os.path.exists(directory):
             print("[+] Creating directory " + directory + " >>\n")
-            os.makedirs(directory)
+            os.makedirs("results/" + directory)
 
     @staticmethod
-    def create_files(project_name, base_url):
-        SaveData.crawled_dirs_path = os.path.join(project_name, 'results/crawled_dirs.txt')
-        SaveData.links_path = os.path.join(project_name, "results/visited_links.txt")
-        SaveData.queued_links_path = os.path.join(project_name, "results/queued_links.txt")
+    def create_files(project_name, target_url):
+        SaveData.crawled_dirs_path = "results/" + project_name + "/crawled_dirs.txt"
+        SaveData.links_path = "results/" + project_name + "/visited_links.txt"
+        SaveData.queued_links_path = "results/" + project_name + "/queued_links.txt"
         if not os.path.isfile(SaveData.crawled_dirs_path):
-            SaveData.write_file(SaveData.crawled_dirs_path, "")
+            SaveData.write_file(SaveData.crawled_dirs_path, target_url)
         if not os.path.isfile(SaveData.links_path):
-            SaveData.write_file(SaveData.links_path, "")
+            SaveData.write_file(SaveData.links_path, target_url)
         if not os.path.isfile(SaveData.queued_links_path):
-            SaveData.write_file(SaveData.queued_links_path, "")
+            SaveData.write_file(SaveData.queued_links_path, target_url)
 
     @staticmethod
     def write_file(path, data):
